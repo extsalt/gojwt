@@ -1,4 +1,4 @@
-package jwt
+package gojwt
 
 import (
 	"crypto/hmac"

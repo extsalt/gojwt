@@ -1,3 +1,3 @@
-module github.com/extsalt/go/jwt
+module github.com/extsalt/gojwt
 
 go 1.20

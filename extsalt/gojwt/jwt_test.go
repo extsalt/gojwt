@@ -1,4 +1,4 @@
-package jwt
+package gojwt
 
 import (
 	"encoding/base64"
