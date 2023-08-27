@@ -48,3 +48,17 @@ func TestCreateJWT(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestVerifySignature(t *testing.T) {
+	sub := "12123"
+	plt := "web"
+	secret := "some secret"
+	jwt, err := Create(sub, plt, secret)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = VerifySignature(jwt, secret)
+	if err != nil {
+		t.Errorf("signature failed")
+	}
+}

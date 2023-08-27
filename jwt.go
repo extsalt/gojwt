@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type Header struct {
@@ -48,4 +49,28 @@ func Create(subject string, platform string, secret string) (string, error) {
 	signatureHex := hex.EncodeToString(signature)
 	jwt := fmt.Sprintf("%s.%s.%s", encodedString, payloadEncodedString, signatureHex)
 	return jwt, nil
+}
+
+// VerifySignature verifies that jwt is not-tempered and returns Payload
+func VerifySignature(jwt string, secret string) (*Payload, error) {
+	if len(jwt) == 0 {
+		return nil, fmt.Errorf("malformed jwt")
+	}
+	explodedJwt := strings.Split(jwt, ".")
+	if len(explodedJwt) < 3 {
+		return nil, fmt.Errorf("malformed jwt")
+	}
+	data := fmt.Sprintf("%s.%s", explodedJwt[0], explodedJwt[1])
+	secretBytes := []byte(secret)
+	hasher := hmac.New(sha256.New, secretBytes)
+	hasher.Write([]byte(data))
+	signature := hasher.Sum(nil)
+	signatureHex := hex.EncodeToString(signature)
+	if signatureHex == explodedJwt[2] {
+		var p Payload
+		payload, err := base64.RawStdEncoding.DecodeString(explodedJwt[1])
+		err = json.Unmarshal(payload, &p)
+		return &p, err
+	}
+	return nil, fmt.Errorf("signature failed")
 }
